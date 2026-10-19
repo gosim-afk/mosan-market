@@ -100,7 +100,7 @@ img{display:block;max-width:100%}
     <section class='page-head'>
       <div class='mini'>INVITE & SHARE</div>
       <h1>누군가를 초대해보세요.</h1>
-      <p>가볍게 복사해 보낼 수 있는 짧은 초대 문구를 준비했어요.</p>
+      <p>함께 갈 사람에게 장터 링크를 바로 공유해보세요.</p>
     </section>
     <div class='invite-card'>
       <h2>초대 문구</h2>
@@ -114,13 +114,39 @@ img{display:block;max-width:100%}
 가볍게 산책하듯 둘러보세요.</div>
     </div>
     <div class='button-stack'>
-      <button class='btn dark' type='button' onclick='copyInvite(this)'>초대 문구 복사 ↗</button>
+      <button class='btn dark' type='button' onclick='shareMarket(this)'>초대장 공유하기 ↗</button>
+      <button class='btn light' type='button' onclick='copyLink(this)'>랜딩페이지 링크 복사 ↗</button>
+      <button class='btn light' type='button' onclick='copyInvite(this)'>초대 문구 복사 ↗</button>
       <a class='btn light' href='https://map.naver.com/p/entry/place/2093161258?placePath=%2Fhome' target='_blank' rel='noopener'>네이버 플레이스 ↗</a>
     </div>
     <a class='return' href='index.html'>← 메인 페이지로 돌아가기</a>
   </main>
 </div>
 <script>
+const MARKET_URL = 'https://gosim-afk.github.io/mosan-market/';
+const MARKET_TITLE = '공방마당 작은장터 | MOSAN';
+const MARKET_TEXT = '10월 23일(금)~25일(일) · 오전 10시~오후 5시 · 모산 공방 잔디밭';
+async function copyText(text, btn, successMessage) {
+  try {
+    if (!navigator.clipboard || !window.isSecureContext) throw new Error('clipboard unsupported');
+    await navigator.clipboard.writeText(text);
+    btn.textContent = successMessage;
+  } catch (e) {
+    window.prompt('아래 내용을 복사하세요', text);
+  }
+}
+function copyLink(btn) { return copyText(MARKET_URL, btn, '링크 복사 완료 ✓'); }
+async function shareMarket(btn) {
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: MARKET_TITLE, text: MARKET_TEXT, url: MARKET_URL });
+      return;
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+    }
+  }
+  await copyText(MARKET_URL, btn, '링크 복사 완료 ✓');
+}
 function copyInvite(btn){
   const text = document.getElementById('inviteText').innerText;
   if (navigator.clipboard && window.isSecureContext) {
